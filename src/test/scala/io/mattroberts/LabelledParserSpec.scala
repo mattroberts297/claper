@@ -1,3 +1,5 @@
+package io.mattroberts
+
 import org.scalatest.{MustMatchers, FlatSpec}
 
 class LabelledParserSpec extends FlatSpec with MustMatchers {

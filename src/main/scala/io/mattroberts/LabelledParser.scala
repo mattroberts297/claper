@@ -1,3 +1,5 @@
+package io.mattroberts
+
 trait LabelledParser[A] {
   def parse(args: List[String]): A
 }

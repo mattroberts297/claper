@@ -1,3 +1,5 @@
+package io.mattroberts
+
 import org.scalatest.{MustMatchers, FlatSpec}
 
 class ParserSpec extends FlatSpec with MustMatchers {

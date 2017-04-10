@@ -1,5 +1,5 @@
 lazy val root = (project in file(".")).settings(
-  name := "claper",
+  name := "claper-core",
   organization := "io.mattroberts",
   version := "0.1.0-SNAPSHOT",
   scalaVersion := "2.11.8",
