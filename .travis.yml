@@ -3,8 +3,24 @@ language: scala
 scala:
   - 2.11.8
 
+before_install:
+- openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in secret.asc.enc -out local.secret.asc -d
+- openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in public.asc.enc -out local.public.asc -d
+
 script:
   - sbt clean coverage test coverageReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: sbt publishSigned sonatypeRelease
+  on:
+    tags: true
+
+env:
+  global:
+    - secure: "gSADu/D+fuUIG6rIwn4r/BdI6UYKyfISjfc4J71K3UH0jwsYnKbI/xeuEsi5tYnHSf2cb+0mrsovqMguK8ARAlTyDIGkcBnSs6bXk+3pfH0OjP/Kh8U31hjQMT5WkqGfZBkrOloc7gJSzhMwmVkaOPb2lKZ0ku0Uw/hFpMKq6nXD17iwCvd5BV1SaT/lUaGq7cgxDRpYB2tVvVrS5kk9dU7+D7ASo8Wx/SyYl8PEcK5d4JjwcF815GuHBeSPBjzTrQsowqvN2nN4IWaojRqVAC6cnZv4atPFabFQWFvAZ7sgYhHrUARRTs7bWaTARxNhHmfx/fbHh2Oz6kE6y5NMz/YJa1W6edPTeGqDkT2XS7wDDGhVVrt5IPAjs/F3pGVr4jYd5xTDg+6C2SSC0rrdfW8XoZ7mAastv1lZQaW8iu1P3aqMes97g/QOwN5KVTbuWhA/VhHJALCPjFUB+v8l84EzT36gHAyJO1eHXhwbltyeuvyaiwJB8/sC9YbZWCZd6ACeh6qO9CEdzQygNcBFkCXJTBWch/ZqmcAHxmVk2Wooe3cUxVJWKC7cdnAZ3+nkJFthbjIcGmXhV8x3o0M/z09MysbcduTXxpmiU2vvpEP4GqxTMQIkDzpJivO4kDltSR6bOdfIgJAg6JyJ0tALCc9hvZBcHKSE9liT+aZF/WM="
+    - secure: "TR8jSl6tv2LhV9wwB7JAj7ubbMKv1dxtY/R95Bjs4o3NfX735pX4hienbU21NUcxMwNdGgb36ZtfKQbdNE4s0olV2ZvWN8ZtoiJ1mhhIAL2FKn+crR8lLILfmDN17u5G4NrXE0z2mc25Zw2hW1Xv6q6A8MqL+NM2MCOA/45kXnxYpRzhVM4/VKqLYoCCRNrEAPeTNJzIFcd1w3/TvKDw2UQ+bJV22H90wQbli1N9j5t5k4eUQmmOlYXw2d8YPum1yHr6+BgB63MRwU13DHAbLvtxQ3HOzhCBKNP+NV6V9aHMmvc5iNkpnTtf9zxQAF7QocYZMbdex2k7ZW0X5QhoJeqmRILP9UcL4GF1lRQUTqFxuREH2f+dQ7EUkg7E0SNLcOlkLgy21gvqu7L9xpGmDGwhmRWqpEKbTGeJxBm9lTx7B+zDV1K50FA2lEomO5ozZWlg0yzd038QTv34q3xIvHx+wvLQu9oXbTWcdrp9WJyy0wAjJDNxDXTl5xoEb4pTlUAC3q0FCMl+ifpnAgf2nIVb/hIxFiRgyp46LrVTs9rVmOg8YqHhA6ZhKjS83xlmbK/UUTz0FHAboPW9+YTlaJnhaLy6n1YUgGTByi33Jqev1jCy8seLqkjFwvzzdQCRNKWmt+5wzgoT8oNXwW+FCNhgaBzoAjqJ7LfF+/xZhI8="
