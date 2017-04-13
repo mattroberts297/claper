@@ -2,7 +2,7 @@ lazy val root = (project in file(".")).settings(
   name := "claper",
   organization := "io.mattroberts",
   version := "0.1.0",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.1",
   scalacOptions := Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
     "com.chuusai" %% "shapeless" % "2.3.2",
@@ -37,7 +37,7 @@ lazy val root = (project in file(".")).settings(
     _: sbt.MavenRepository => false
   },
 
-  licenses := Seq("MIT" -> url("https://github.com/mattroberts297/claper/LICENSE")),
+  licenses := Seq("MIT" -> url("https://github.com/mattroberts297/claper/blob/master/LICENSE")),
   homepage := Some(url("https://github.com/mattroberts297/claper")),
   scmInfo := Some(
     ScmInfo(

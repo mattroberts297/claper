@@ -14,16 +14,37 @@ object LabelledParser {
     }
   }
 
-  implicit val stringParser: LabelledParser[String] = {
-    create(args => args.head)
+  implicit def stringParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): LabelledParser[FieldType[K, String]] = {
+    val name = witness.value.name
+    create { args =>
+      val arg = args.dropWhile(a => a != s"--$name").tail.head
+      field[K](arg)
+    }
   }
 
-  implicit val intParser: LabelledParser[Int] = {
-    create(args => args.head.toInt)
+  implicit def intParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): LabelledParser[FieldType[K, Int]] = {
+    val name = witness.value.name
+    create { args =>
+      val arg = args.dropWhile(a => a != s"--$name").tail.head.toInt
+      field[K](arg)
+    }
   }
 
-  implicit val boolParser: LabelledParser[Boolean] = {
-    create(args => args.head.toBoolean)
+  implicit def booleanParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): LabelledParser[FieldType[K, Boolean]] = {
+    val name = witness.value.name
+    create { args =>
+      val arg = args.find(a => a == s"--$name").isDefined
+      field[K](arg)
+    }
   }
 
   implicit val hnilParser: LabelledParser[HNil] = {
@@ -33,15 +54,13 @@ object LabelledParser {
   implicit def hlistLabelledParser[K <: Symbol, H, T <: HList](
     implicit
     witness: Witness.Aux[K],
-    hParser: Lazy[LabelledParser[H]],
+    hParser: Lazy[LabelledParser[FieldType[K, H]]],
     tParser: LabelledParser[T]
   ): LabelledParser[FieldType[K, H] :: T] = {
     create { args =>
-      val name = witness.value.name
-      val hs = args.dropWhile(a => a != s"--$name")
-      val hv = hParser.value.parse(hs.tail)
+      val hv = hParser.value.parse(args)
       val tv = tParser.parse(args)
-      field[K](hv) :: tv
+      hv :: tv
     }
   }
 

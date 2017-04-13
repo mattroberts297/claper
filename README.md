@@ -1,7 +1,7 @@
 # CLAPer
 
 [![Build status](https://travis-ci.org/mattroberts297/claper.svg?branch=master)](https://travis-ci.org/mattroberts297/claper)
-[![Coverage status](https://codecov.io/gh/mattroberts297/claper/branch/master/graph/badge.svg)](https://codecov.io/gh/mattroberts297/claper)
+[![Coverage status](https://coveralls.io/repos/github/mattroberts297/claper/badge.svg?branch=master)](https://coveralls.io/github/mattroberts297/claper?branch=master)
 
 A Command Line Argument Parser without the boiler plate.
 
