@@ -5,8 +5,41 @@
 
 A Command Line Argument Parser without the boiler plate.
 
+## Getting Started
+
+Add the library as a dependency in your project's `build.sbt` file:
+
+```scala
+scalaVersion := "2.12.1"
+
+libraryDependencies ++= Seq(
+  "io.mattroberts" %% "claper" % "0.2.0"
+)
+```
+
+Then use it to parse command line arguments:
+
+```scala
+import io.mattroberts.Claper
+case class Args(alpha: String, beta: Int, charlie: Boolean)
+val args = List("--alpha", "alpha", "--beta", "1", "--charlie")
+val parsed = Claper[Args].parse(args)
+println(parsed) // Right(Args("alpha", 1, true))
+```
+
 ## Usage
 
-For this style: `my-app --alpha a --beta 1 --charlie true`, see [LabelledParserSpec](src/test/scala/io/mattroberts/LabelledParserSpec.scala).
+See [ClaperSpec](src/test/scala/io/mattroberts/ClaperSpec.scala) for full usage.
 
-For this style: `my-app a 1 true`, see [ParserSpec](src/test/scala/io/mattroberts/ParserSpec.scala).
+## Features
+
+- Support for case classes (products)
+- Support for default values
+- Support for Linux style arguments
+
+## Future Features
+
+In the future I might:
+
+- Add coproduct support
+- Add short Linux style arguments
