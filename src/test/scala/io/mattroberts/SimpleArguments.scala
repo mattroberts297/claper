@@ -1,3 +1,3 @@
 package io.mattroberts
 
-case class SimpleArguments(alpha: String, beta: Int, charlie: Boolean)
+case class SimpleArguments(alpha: String = "alpha", beta: Int, charlie: Boolean)
