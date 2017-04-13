@@ -41,5 +41,6 @@ See [ClaperSpec](src/test/scala/io/mattroberts/ClaperSpec.scala) for full usage.
 
 In the future I might:
 
+- Add more primitive types
 - Add coproduct support
 - Add short Linux style arguments
