@@ -14,7 +14,7 @@ Add the library as a dependency in your project's `build.sbt` file:
 scalaVersion := "2.12.1"
 
 libraryDependencies ++= Seq(
-  "io.mattroberts" %% "claper" % "0.2.0"
+  "io.mattroberts" %% "claper" % "0.3.0"
 )
 ```
 
@@ -42,6 +42,5 @@ See [ClaperSpec](src/test/scala/io/mattroberts/ClaperSpec.scala) for full usage.
 
 In the future I might:
 
-- Add more primitive types
 - Add coproduct support
 - Add short Linux style arguments
