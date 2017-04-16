@@ -2,6 +2,7 @@
 
 [![Build status](https://travis-ci.org/mattroberts297/claper.svg?branch=master)](https://travis-ci.org/mattroberts297/claper)
 [![Coverage status](https://coveralls.io/repos/github/mattroberts297/claper/badge.svg?branch=master)](https://coveralls.io/github/mattroberts297/claper?branch=master)
+[![Maven central](https://img.shields.io/maven-central/v/io.mattroberts/claper_2.12.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.mattroberts%22%20a%3A%22claper_2.12%22)
 
 A Command Line Argument Parser without the boiler plate.
 
