@@ -12,7 +12,8 @@ class ClaperSpec extends FlatSpec with MustMatchers {
       echo: Long,
       foxtrot: Float,
       golf: Double,
-      hotel: Boolean)
+      hotel: Boolean,
+      india: Char)
 
     val args = List(
       "--alpha", "alpha",
@@ -22,7 +23,8 @@ class ClaperSpec extends FlatSpec with MustMatchers {
       "--echo", "4294967296",
       "--foxtrot", "1.5",
       "--golf", "1.5",
-      "--hotel")
+      "--hotel",
+      "--india", "a")
   }
 
   object Defaults {
@@ -34,7 +36,8 @@ class ClaperSpec extends FlatSpec with MustMatchers {
       echo: Long = 4294967296L,
       foxtrot: Float = 1.5F,
       golf: Double = 1.5,
-      hotel: Boolean)
+      hotel: Boolean = false,
+      india: Char = 'a')
 
     val args = List.empty[String]
   }
@@ -50,21 +53,14 @@ class ClaperSpec extends FlatSpec with MustMatchers {
       echo = 4294967296L,
       foxtrot = 1.5F,
       golf = 1.5,
-      hotel = true)))
+      hotel = true,
+      india = 'a')))
   }
 
   it must "use defaults" in {
     import Defaults._
     val parsed = Claper[Args].parse(args)
-    parsed must be (Right(Args(
-      alpha = "alpha",
-      bravo = 1,
-      charlie = 256,
-      delta = 65536,
-      echo = 4294967296L,
-      foxtrot = 1.5F,
-      golf = 1.5,
-      hotel = false)))
+    parsed must be (Right(Args()))
   }
 
   it must "error on missing strings" in {
@@ -107,6 +103,12 @@ class ClaperSpec extends FlatSpec with MustMatchers {
     import NoDefaults._
     val parsed = Claper[Args].parse(removeNthArg(args, 7))
     parsed must be (Left(ClaperError("Missing argument golf")))
+  }
+
+  it must "error on missing chars" in {
+    import NoDefaults._
+    val parsed = Claper[Args].parse(removeNthArg(args, 8))
+    parsed must be (Left(ClaperError("Missing argument india")))
   }
 
   def removeNthArg(args: Seq[String], n: Int): Seq[String] = {

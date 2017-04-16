@@ -45,11 +45,6 @@ trait UnderlyingClaper[A, B] {
 object UnderlyingClaper {
   import Claper.Or
 
-  def apply[A, B](
-    implicit
-    st: Lazy[UnderlyingClaper[A, B]]
-  ): UnderlyingClaper[A, B] = st.value
-
   implicit val hnilParser: UnderlyingClaper[HNil, HNil] = {
     create { (_, _) => Right(HNil) }
   }
