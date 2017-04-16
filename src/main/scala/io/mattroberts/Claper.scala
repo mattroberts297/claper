@@ -20,12 +20,6 @@ object Claper {
     st: Lazy[Claper[A]]
   ): Claper[A] = st.value
 
-  def create[A](thunk: Seq[String] => ClaperError Or A): Claper[A] = {
-    new Claper[A] {
-      def parse(args: Seq[String]): ClaperError Or A = thunk(args)
-    }
-  }
-
   implicit def genericParser[A, R <: HList, D <: HList](
     implicit
     defaults: Default.AsOptions.Aux[A, D],
@@ -33,6 +27,12 @@ object Claper {
     parser: Lazy[UnderlyingClaper[R, D]]
   ): Claper[A] = {
     create { args => parser.value.parse(args, defaults()).map(generic.from) }
+  }
+
+  private def create[A](thunk: Seq[String] => ClaperError Or A): Claper[A] = {
+    new Claper[A] {
+      def parse(args: Seq[String]): ClaperError Or A = thunk(args)
+    }
   }
 }
 
@@ -49,16 +49,6 @@ object UnderlyingClaper {
     implicit
     st: Lazy[UnderlyingClaper[A, B]]
   ): UnderlyingClaper[A, B] = st.value
-
-  def create[A, B](
-    thunk: (Seq[String], B) => ClaperError Or A
-  ): UnderlyingClaper[A, B] = {
-    new UnderlyingClaper[A, B] {
-      def parse(args: Seq[String], defaults: B): ClaperError Or A = {
-        thunk(args, defaults)
-      }
-    }
-  }
 
   implicit val hnilParser: UnderlyingClaper[HNil, HNil] = {
     create { (_, _) => Right(HNil) }
@@ -84,30 +74,49 @@ object UnderlyingClaper {
     implicit
     witness: Witness.Aux[K]
   ): UnderlyingClaper[FieldType[K, String], Option[String]] = {
-    val name = witness.value.name
-    create { (args, defaultArg) =>
-      val providedArg = getArgFor(args, name)
-      providedArg.map(Right(_)).getOrElse(
-        defaultArg.map(Right(_)).getOrElse(
-          Left(ClaperError(s"Missing argument $name"))
-        )
-      ).map(field[K](_))
-    }
+    createWithWitness(_.toString)
+  }
+
+  implicit def byteParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Byte], Option[Byte]] = {
+    createWithWitness(_.toByte)
+  }
+
+  implicit def shortParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Short], Option[Short]] = {
+    createWithWitness(_.toShort)
   }
 
   implicit def intParser[K <: Symbol](
     implicit
     witness: Witness.Aux[K]
   ): UnderlyingClaper[FieldType[K, Int], Option[Int]] = {
-    val name = witness.value.name
-    create { (args, defaultArg) =>
-      val providedArg = getArgFor(args, name).map(_.toInt)
-      providedArg.map(Right(_)).getOrElse(
-        defaultArg.map(Right(_)).getOrElse(
-          Left(ClaperError(s"Missing argument $name"))
-        )
-      ).map(field[K](_))
-    }
+    createWithWitness(_.toInt)
+  }
+
+  implicit def longParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Long], Option[Long]] = {
+    createWithWitness(_.toLong)
+  }
+
+  implicit def floatParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Float], Option[Float]] = {
+    createWithWitness(_.toFloat)
+  }
+
+  implicit def doubleParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Double], Option[Double]] = {
+    createWithWitness(_.toDouble)
   }
 
   implicit def booleanParser[K <: Symbol](
@@ -118,6 +127,42 @@ object UnderlyingClaper {
     create { (args, default) =>
       val arg = args.find(a => a == s"--$name").isDefined
       Right(field[K](arg))
+    }
+  }
+
+  implicit def charParser[K <: Symbol](
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, Char], Option[Char]] = {
+    createWithWitness(_(0))
+  }
+
+  private def create[A, B](
+    thunk: (Seq[String], B) => ClaperError Or A
+  ): UnderlyingClaper[A, B] = {
+    new UnderlyingClaper[A, B] {
+      def parse(args: Seq[String], defaults: B): ClaperError Or A = {
+        thunk(args, defaults)
+      }
+    }
+  }
+
+  private def createWithWitness[A, K <: Symbol](
+    thunk: String => A
+  )(
+    implicit
+    witness: Witness.Aux[K]
+  ): UnderlyingClaper[FieldType[K, A], Option[A]] = {
+    new UnderlyingClaper[FieldType[K, A], Option[A]] {
+      def parse(args: Seq[String], defaultArg: Option[A]): ClaperError Or FieldType[K, A] = {
+        val name = witness.value.name
+        val providedArg = getArgFor(args, name).map(thunk)
+        providedArg.map(Right(_)).getOrElse(
+          defaultArg.map(Right(_)).getOrElse(
+            Left(ClaperError(s"Missing argument $name"))
+          )
+        ).map(a => field[K](a))
+      }
     }
   }
 
