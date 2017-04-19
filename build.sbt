@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")).settings(
   name := "claper",
   organization := "io.mattroberts",
-  version := "0.2.0",
+  version := "0.3.0",
   scalaVersion := "2.12.1",
   scalacOptions := Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= Seq(
