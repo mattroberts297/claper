@@ -4,7 +4,7 @@ scala:
   - 2.12.1
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 before_install:
 - openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in secret.asc.enc -out local.secret.asc -d

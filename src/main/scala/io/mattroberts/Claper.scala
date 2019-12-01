@@ -65,6 +65,22 @@ object UnderlyingClaper {
     }
   }
 
+  implicit def optionParser[A, K <: Symbol](
+    implicit
+    witness: Witness.Aux[K],
+    aParser: UnderlyingClaper[FieldType[K, A], Option[A]]
+  ): UnderlyingClaper[FieldType[K, Option[A]], Option[Option[A]]] = {
+    val name = witness.value.name
+    create { (args, default) =>
+      val argDefined = args.find(a => a == s"--$name").isDefined
+      if (argDefined) {
+        aParser.parse(args, default.flatten).map(v => field[K](Option(v)))
+      } else {
+        Right(field[K](None))
+      }
+    }
+  }
+
   implicit def stringParser[K <: Symbol](
     implicit
     witness: Witness.Aux[K]

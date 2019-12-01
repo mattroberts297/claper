@@ -42,6 +42,43 @@ class ClaperSpec extends FlatSpec with MustMatchers {
     val args = List.empty[String]
   }
 
+  object Options {
+    case class Args(
+      alpha: Option[String],
+      bravo: Option[Byte],
+      charlie: Option[Short],
+      delta: Option[Int],
+      echo: Option[Long],
+      foxtrot: Option[Float],
+      golf: Option[Double],
+      hotel: Option[Boolean],
+      india: Option[Char]
+    )
+
+    val parsedArgs = Args(
+      alpha = Some("alpha"),
+      bravo = Some(1),
+      charlie = Some(256),
+      delta = Some(65536),
+      echo = Some(4294967296L),
+      foxtrot = Some(1.5f),
+      golf = Some(1.5d),
+      hotel = Some(true),
+      india = Some('a')
+    )
+
+    val args = List(
+      "--alpha", "alpha",
+      "--bravo", "1",
+      "--charlie", "256",
+      "--delta", "65536",
+      "--echo", "4294967296",
+      "--foxtrot", "1.5",
+      "--golf", "1.5",
+      "--hotel",
+      "--india", "a")
+  }
+
   "Claper" must "parse all args" in {
     import NoDefaults._
     val parsed = Claper[Args].parse(args)
@@ -109,6 +146,11 @@ class ClaperSpec extends FlatSpec with MustMatchers {
     import NoDefaults._
     val parsed = Claper[Args].parse(removeNthArg(args, 8))
     parsed must be (Left(ClaperError("Missing argument india")))
+  }
+  it must "ignore missing optional strings" in {
+    import Options._
+    val parsed = Claper[Args].parse(removeNthArg(args, 1))
+    parsed must be (Right(parsedArgs.copy(alpha = None)))
   }
 
   def removeNthArg(args: Seq[String], n: Int): Seq[String] = {
