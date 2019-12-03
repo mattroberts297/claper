@@ -26,7 +26,7 @@ object Claper {
     generic: LabelledGeneric.Aux[A, R],
     parser: Lazy[UnderlyingClaper[R, D]]
   ): Claper[A] = {
-    create { args => parser.value.parse(args, defaults()).map(generic.from) }
+    create { args => parser.value.parse(args, defaults()).right.map(generic.from) }
   }
 
   private def create[A](thunk: Seq[String] => ClaperError Or A): Claper[A] = {
@@ -59,8 +59,8 @@ object UnderlyingClaper {
       val hv = hParser.value.parse(args, defaults.head)
       val tv = tParser.parse(args, defaults.tail)
       for {
-        h <- hv
-        t <- tv
+        h <- hv.right
+        t <- tv.right
       } yield h :: t
     }
   }
@@ -74,7 +74,7 @@ object UnderlyingClaper {
     create { (args, default) =>
       val argDefined = args.find(a => a == s"--$name").isDefined
       if (argDefined) {
-        aParser.parse(args, default.flatten).map(v => field[K](Option(v)))
+        aParser.parse(args, default.flatten).right.map(v => field[K](Option(v)))
       } else {
         Right(field[K](None))
       }
@@ -172,7 +172,7 @@ object UnderlyingClaper {
           defaultArg.map(Right(_)).getOrElse(
             Left(ClaperError(s"Missing argument $name"))
           )
-        ).map(a => field[K](a))
+        ).right.map(a => field[K](a))
       }
     }
   }
