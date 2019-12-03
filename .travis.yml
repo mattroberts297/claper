@@ -1,27 +1,30 @@
 language: scala
 
 scala:
-  - 2.12.1
+  - 2.12.2
 
 jdk:
   - openjdk8
 
-before_install:
-- openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in secret.asc.enc -out local.secret.asc -d
-- openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in public.asc.enc -out local.public.asc -d
-
 script:
-  - sbt clean coverage test coverageReport
+  - sbt +clean coverage +test coverageReport
 
 after_success:
   - sbt coveralls
 
+before_deploy:
+  - openssl aes-256-cbc -pass pass:$PGP_PASSPHRASE -in secret.asc.enc -out local.secret.asc -d
+  - echo $PGP_PASSPHRASE | gpg --batch --passphrase-fd 0 --import local.secret.asc
+
 deploy:
   skip_cleanup: true
   provider: script
-  script: sbt publishSigned sonatypeRelease
+  script: sbt +publishSigned sonatypePrepare sonatypeBundleUpload # sonatypeBundleRelease
   on:
     tags: true
+
+after_deploy:
+  - gpg --batch --delete-secret-keys B89EBE31B8541C9AB694A7063926C2AF62D1F8D5
 
 env:
   global:

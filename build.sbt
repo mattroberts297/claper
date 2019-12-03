@@ -1,38 +1,49 @@
+lazy val scala213 = "2.13.1"
+lazy val scala212 = "2.12.10"
+lazy val scala211 = "2.11.12"
+lazy val scala210 = "2.10.7"
+lazy val supportedScalaVersions = List(scala213, scala212, scala211, scala210)
+
+lazy val dependencies = List(
+  "com.chuusai" %% "shapeless" % "2.3.3",
+  "org.scalatest" %% "scalatest" % "3.1.0" % "test"
+)
+
+lazy val dependenciesForScala210 = List(
+  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+)
+
 lazy val root = (project in file(".")).settings(
   name := "claper",
   organization := "io.mattroberts",
   version := "0.3.0",
-  scalaVersion := "2.12.1",
+  scalaVersion := scala213,
+  crossScalaVersions := supportedScalaVersions,
   scalacOptions := Seq("-deprecation", "-feature", "-unchecked"),
-  libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  libraryDependencies ++= (scalaBinaryVersion.value match {
+    case "2.10" => dependencies ++ dependenciesForScala210
+    case _      => dependencies
+  }),
+
+  credentials ++= Seq(
+    Credentials(
+      "Sonatype Nexus Repository Manager",
+      "oss.sonatype.org",
+      "mattroberts297",
+      env("SONATYPE_PASSWORD")
+    ),
+    Credentials(
+      "GnuPG Key ID",
+      "gpg",
+      "B89EBE31B8541C9AB694A7063926C2AF62D1F8D5",
+      env("PGP_PASSPHRASE")
+    )
   ),
 
-  pgpPassphrase := Option(env("PGP_PASSPHRASE")).map(_.toCharArray),
-  pgpSecretRing := file("local.secret.asc"),
-  pgpPublicRing := file("local.public.asc"),
-
-  credentials += Credentials(
-    "Sonatype Nexus Repository Manager",
-    "oss.sonatype.org",
-    "mattroberts297",
-    env("SONATYPE_PASSWORD")
-  ),
-
+  publishTo := sonatypePublishToBundle.value,
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  },
 
-  makePomConfiguration ~= {
-    _.copy(configurations = Some(Seq(Compile, Runtime, Optional)))
-  },
   pomIncludeRepository := {
     _: sbt.MavenRepository => false
   },

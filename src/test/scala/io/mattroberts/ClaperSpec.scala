@@ -1,8 +1,9 @@
 package io.mattroberts
 
-import org.scalatest.{MustMatchers, FlatSpec}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
 
-class ClaperSpec extends FlatSpec with MustMatchers {
+class ClaperSpec extends AnyFlatSpec with Matchers {
   object NoDefaults {
     case class Args(
       alpha: String,
