@@ -19,7 +19,7 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: sbt +publishSigned sonatypePrepare sonatypeBundleUpload # sonatypeBundleRelease
+  script: sbt +publishSigned sonatypeBundleRelease
   on:
     tags: true
 

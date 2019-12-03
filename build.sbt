@@ -16,7 +16,6 @@ lazy val dependenciesForScala210 = List(
 lazy val root = (project in file(".")).settings(
   name := "claper",
   organization := "io.mattroberts",
-  version := "0.3.0",
   scalaVersion := scala213,
   crossScalaVersions := supportedScalaVersions,
   scalacOptions := Seq("-deprecation", "-feature", "-unchecked"),
