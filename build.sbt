@@ -2,28 +2,39 @@ lazy val scala213 = "2.13.1"
 lazy val scala212 = "2.12.10"
 lazy val scala211 = "2.11.12"
 lazy val scala210 = "2.10.7"
-lazy val supportedScalaVersions = List(scala213, scala212, scala211, scala210)
+lazy val supportedScalaVersions = Seq(scala213, scala212, scala211, scala210)
 
-lazy val dependencies = List(
-  "com.chuusai" %% "shapeless" % "2.3.3",
-  "org.scalatest" %% "scalatest" % "3.1.0" % "test"
-)
+lazy val dependencies = Def.setting(Seq(
+  "com.chuusai" %%% "shapeless" % "2.3.3",
+  "org.scalatest" %%% "scalatest" % "3.2.1" % "test"
+))
 
-lazy val dependenciesForScala210 = List(
+lazy val dependenciesForScala210 = Def.setting(Seq(
   compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
-)
+))
 
-lazy val root = (project in file(".")).settings(
+lazy val sharedSettings = Seq(
   name := "claper",
   organization := "io.mattroberts",
-  scalaVersion := scala213,
-  crossScalaVersions := supportedScalaVersions,
   scalacOptions := Seq("-deprecation", "-feature", "-unchecked"),
   libraryDependencies ++= (scalaBinaryVersion.value match {
-    case "2.10" => dependencies ++ dependenciesForScala210
-    case _      => dependencies
-  }),
+    case "2.10" => dependencies.value ++ dependenciesForScala210.value
+    case _      => dependencies.value
+  })
+)
 
+lazy val jvmSettings = Seq(
+  scalaVersion := scala213,
+  crossScalaVersions := supportedScalaVersions
+)
+
+lazy val nativeSettings = Seq(
+  scalaVersion := scala211,
+  crossScalaVersions := Seq(scala211),
+  nativeLinkStubs := true
+)
+
+lazy val publishSettings = Seq(
   credentials ++= Seq(
     Credentials(
       "Sonatype Nexus Repository Manager",
@@ -63,6 +74,18 @@ lazy val root = (project in file(".")).settings(
       url   = url("https://mattroberts.io")
     )
   )
-)
+) 
+
+lazy val claper = crossProject(JVMPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("."))
+  .settings(sharedSettings)
+  .jvmSettings(jvmSettings)
+  .nativeSettings(nativeSettings)
 
 def env(name: String): String = System.getenv().get(name)
+
+lazy val root = project
+  .in(file("."))
+  .aggregate(claper.jvm, claper.native)
+  .settings(crossScalaVersions := Nil)
