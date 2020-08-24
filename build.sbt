@@ -79,7 +79,7 @@ lazy val publishSettings = Seq(
 lazy val claper = crossProject(JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("."))
-  .settings(sharedSettings)
+  .settings(sharedSettings ++ publishSettings)
   .jvmSettings(jvmSettings)
   .nativeSettings(nativeSettings)
 
