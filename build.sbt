@@ -88,4 +88,5 @@ def env(name: String): String = System.getenv().get(name)
 lazy val root = project
   .in(file("."))
   .aggregate(claper.jvm, claper.native)
-  .settings(crossScalaVersions := Nil)
+  .settings(sharedSettings ++ publishSettings)
+  .settings(crossScalaVersions := Nil, publishArtifact := false)
