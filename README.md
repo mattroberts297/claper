@@ -44,3 +44,6 @@ In the future I might:
 
 - Add coproduct support
 - Add short Linux style arguments
+- Add support for list arguments (delimited)
+- Add support for enumerations
+- Add support for ClaperApp (like App)
